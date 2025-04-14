@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { BarChart } from 'react-native-chart-kit'; // Asegúrate de instalar esta librería
 import { Dimensions } from 'react-native';
-import { createClient } from '@supabase/supabase-js';
+import { Ionicons } from '@expo/vector-icons';
 
+import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = 'https://lueckcjjjsjwiesapqhs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZWNrY2pqanNqd2llc2FwcWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NTIzNzIsImV4cCI6MjA1OTAyODM3Mn0.y6i8VwWytF-eGuNvWvbTDXX3R5A3W5AxYygZnjXycJg';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -12,19 +13,7 @@ const Statistic = ({ navigation }) => {
   const [average, setAverage] = useState(0);
 
   const fetchAverage = async () => {
-    const { data, error } = await supabase
-      .from('Expenses')
-      .select('amount');
-    //   const user = supabase.auth.user();
-    //   if (!user) {
-    //     Alert.alert('Error', 'Usuario no autenticado.');
-    //     return;
-    //   }
-  
-    //   const { data, error } = await supabase
-    //     .from('Expenses')
-    //     .select('amount')
-    //     .eq('user_id', user.id);   
+    const { data, error } = await supabase.from('Expenses').select('amount');
 
     if (error) {
       console.error('Error al obtener los gastos:', error.message);
@@ -45,37 +34,36 @@ const Statistic = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.header}>Estatisticas</Text>
         <Text style={styles.averageText}>Promedio de Gastos: ${average.toFixed(2)}</Text>
-        <BarChart
-          data={{
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [
-              {
-                data: [average, average, average, average, average, average, average], 
+        
+        {/* Chart Section */}
+        <View style={styles.chartContainer}>
+          <BarChart
+            data={{
+              labels: ['Lun', 'Mar', 'Mier', 'Jue', 'Vier', 'Sab', 'Dom'],
+              datasets: [{data: [average, average, average, average, average, average, average],},],
+            }}
+            width={Dimensions.get('window').width - 45}
+            height={222}
+            yAxisLabel="$"
+            chartConfig={{
+              backgroundColor: '#6F3B8E',
+              backgroundGradientFrom: '#6F3B8E',
+              backgroundGradientTo: '#A8A3DD',
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {
+                borderRadius: 16,
               },
-            ],
-          }}
-          width={Dimensions.get('window').width - 40}
-          height={220}
-          yAxisLabel="$"
-          chartConfig={{
-            backgroundColor: '#6F3B8E',
-            backgroundGradientFrom: '#6F3B8E',
-            backgroundGradientTo: '#A8A3DD',
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-            propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: '#ffa726',
-            },
-          }}
-          style={styles.chart}
-        />
+              propsForDots: {r: '6', strokeWidth: '2', stroke: '#ffa726',},
+            }}
+            style={styles.chart}
+          />
+        </View>
       </View>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.bottomBackButton}>
+        <Ionicons name="arrow-back" size={33} color="black" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -87,7 +75,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 30,
     alignItems: 'center',
   },
   header: {
@@ -101,9 +89,33 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 20,
   },
+  chartContainer: {
+    marginVertical: 8,
+    borderRadius: 22,
+    borderWidth: 3,
+    borderColor: '#5A4B81',
+    padding: 8, 
+    backgroundColor: '#F3E8FD',
+  },
   chart: {
     marginVertical: 8,
     borderRadius: 16,
+    borderWidth: 3,
+    borderRadius: 22,
+    borderColor: '#5A4B81',
+  },
+  bottomBackButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#F3E8FD',
+    padding: 10,
+    borderRadius: 30,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
 });
 

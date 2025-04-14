@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 // import AppNavigator from '../AppNavigator';
 // import { useNavigation } from '@react-navigation/native';
-import { createClient } from '@supabase/supabase-js';
 
 // supa client
+import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = 'https://lueckcjjjsjwiesapqhs.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZWNrY2pqanNqd2llc2FwcWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NTIzNzIsImV4cCI6MjA1OTAyODM3Mn0.y6i8VwWytF-eGuNvWvbTDXX3R5A3W5AxYygZnjXycJg'
 const supabase = createClient(supabaseUrl, supabaseKey)
@@ -41,46 +42,60 @@ export default function SignUp({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <TouchableOpacity style={styles.backButtons} onPress={() => navigation.goBack}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity> */}
-      
-        <Text style={styles.title}>Crea una Cuenta!!</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-      />
-      <TouchableOpacity style={styles.signUpButton} onPress={() => SignUp()}>
-        <Text style={styles.signUpButtonText}>SIGN UP</Text>
-      </TouchableOpacity>
+      <View style={styles.formContainer}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Crea una Cuenta!!</Text>
+        </View>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email"
+          placeholderTextColor="#aaa"
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Password"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+        />
+        <TouchableOpacity style={styles.signUpButton} onPress={() => SignUp()}>
+          <Text style={styles.signUpButtonText}>SIGN UP</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#A8A3DD',
+    backgroundColor: '#D0D4FE',
+  },
+  formContainer: {
+    // flex: 1,
+    width: '95%',
+    backgroundColor: '#A197D9',
+    borderRadius: 35,
+    padding: 20,
+    borderWidth: 3,
+    strokeColor: 'black',
+    marginHorizontal: 8,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#6F3B8E',
+    textAlign: 'center',
   },
   input: {
     width: '100%',

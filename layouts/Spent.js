@@ -1,22 +1,27 @@
-//tabs
-import React, { useState , useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert, } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, SafeAreaView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-// supabase client
-import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://lueckcjjjsjwiesapqhs.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZWNrY2pqanNqd2llc2FwcWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NTIzNzIsImV4cCI6MjA1OTAyODM3Mn0.y6i8VwWytF-eGuNvWvbTDXX3R5A3W5AxYygZnjXycJg'
-const supabase = createClient(supabaseUrl, supabaseKey)
+// Supabase client
+import { createClient } from '@supabase/supabase-js';
+const supabaseUrl = 'https://lueckcjjjsjwiesapqhs.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZWNrY2pqanNqd2llc2FwcWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NTIzNzIsImV4cCI6MjA1OTAyODM3Mn0.y6i8VwWytF-eGuNvWvbTDXX3R5A3W5AxYygZnjXycJg';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-export default function Spent({ navigation }) {
+export default function Spent({ route, navigation }) {
+  const { tittle } = route.params || {};
   const [value, setValue] = useState('');
   const [TotalAmount, setTotalAmount] = useState(0);
 
+  useEffect(() => {
+    if (!tittle) {
+      Alert.alert('Error', 'Debes completar el paso anterior antes de continuar.');
+      navigation.navigate('SpentTittle');
+    }
+  }, [tittle]);
+
   const fetchTotalAmount = async () => {
-    const { data, error } = await supabase
-      .from('Expenses')
-      .select('amount')
-      // .insert([{ tittle ,amount: parseFloat(value) }]) //titulo y valor
+    const { data, error } = await supabase.from('Expenses').select('amount');
 
     if (error) {
       console.error('Error al obtener el total:', error.message);
@@ -24,7 +29,7 @@ export default function Spent({ navigation }) {
     }
 
     const total = data.reduce((sum, expense) => sum + expense.amount, 0);
-    setTotalAmount(total); 
+    setTotalAmount(total);
   };
 
   const handlePress = (key) => {
@@ -45,61 +50,74 @@ export default function Spent({ navigation }) {
       return;
     }
 
-    
-
-    const { data, error } = await supabase
-        .from('Expenses')
-        .insert([{ amount: parseFloat(value) }]);
+    const { data, error } = await supabase.from('Expenses').insert([{ tittle, amount: parseFloat(value) }]);
 
     if (error) {
-        console.error('Error al insertar en Supabase:', error.message);
-        Alert.alert('Error', 'No se pudo guardar el valor.');
-        return;
+      console.error('Error al insertar en Supabase:', error.message);
+      Alert.alert('Error', 'No se pudo guardar el valor.');
+      return;
     }
-            
-     Alert.alert('Éxito', `Valor guardado: $${value}`);
+
+    Alert.alert('Éxito', `Gasto registrado: ${tittle} - $${value}`);
     setValue('');
     fetchTotalAmount();
-     navigation.goBack();
-};
+    navigation.navigate('MainScreen'); 
+  };
 
-    useEffect(() => { fetchTotalAmount();}, 
-    []);
+  useEffect(() => {
+    fetchTotalAmount();
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Total Amount: ${TotalAmount.toFixed(2)}</Text>
-      <Text style={styles.label}>enter value:</Text>
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputText}>${value || '0.00'}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.label}>descripción: {tittle || 'No definido'}</Text>
+        <Text style={styles.label}>Monto Total: ${TotalAmount.toFixed(2)}</Text>
+        <Text style={styles.label}>Indique el valor:</Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputText}>${value || '0.00'}</Text>
+        </View>
+        <View style={styles.keyboard}>
+          {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'back'].map((key) => (
+            <TouchableOpacity key={key} style={styles.key} onPress={() => handlePress(key)}>
+              <Text style={styles.keyText}>{key === 'back' ? '↩' : key}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+          <Text style={styles.confirmButtonText}>CONFIRM</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.keyboard}>
-        {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'back'].map((key) => (
-          <TouchableOpacity
-            key={key}
-            style={styles.key}
-            onPress={() => handlePress(key)}
-          >
-            <Text style={styles.keyText}>
-              {key === 'back' ? '↩' : key}
-            </Text>
-          </TouchableOpacity>
-        ))}
+
+      {/* Footer Navigation */}
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Expenses')}>
+          <Ionicons name="cash-outline" size={24} color="black" />
+          <Text style={styles.footerText}>Expenses</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('MainScreen')}>
+          <Ionicons name="home-outline" size={24} color="black" />
+          <Text style={styles.footerText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('SpentTittle')}>
+          <Ionicons name="calculator-outline" size={24} color="black" />
+          <Text style={styles.footerText}>Spent</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-        <Text style={styles.confirmButtonText}>CONFIRM</Text>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#EADCF8',
+  },
+  container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 6,
+    padding: 10,
   },
   label: {
     fontSize: 18,
@@ -107,6 +125,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#5A4B81',
     textTransform: 'uppercase',
+  },
+  subLabel: {
+    fontSize: 16,
+    color: '#5A4B81',
+    marginBottom: 10,
   },
   inputContainer: {
     width: '80%',
@@ -176,5 +199,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     textTransform: 'uppercase',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#FBF0FA',
+    borderWidth: 3,
+    padding: 10,
+    borderRadius: 25,
+    position: 'absolute',
+    bottom: 40,
+    left: 10,
+    right: 10,
+  },
+  footerButton: {
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 12,
+    color: 'black',
+    marginTop: 5,
   },
 });

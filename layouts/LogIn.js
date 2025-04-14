@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-
 // SupaBaseClient
 import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://lueckcjjjsjwiesapqhs.supabase.co'
@@ -76,12 +75,9 @@ export default function LogIn({ navigation }) {
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
             placeholder="Password"
-            placeholderTextColor="#aaa"
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
-          >
+            placeholderTextColor="#aaa"/>
+
+          <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword(!showPassword)}>
             <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#666" />
           </TouchableOpacity>
         </View>
@@ -131,10 +127,15 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
+    // height: '65%',
     backgroundColor: '#A197D9',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    padding: 20,
+    borderRadius: 35,
+    padding: 30,
+    // strokeWidth: 3,
+    borderWidth: 3,
+    strokeColor: 'black',
+    marginHorizontal: 8,
+    marginBottom: -40,
   },
   labelText: {
     color: '#444',
@@ -223,7 +224,8 @@ const styles = StyleSheet.create({
   },
   signupText: {
     color: '#6F3B8E',
-    fontSize: 14,
+    fontSize: 16,
+    fontStyle: 'italic',
     fontWeight: 'bold',
   },
 });
