@@ -14,49 +14,35 @@ export default function LogIn({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    
-    const { user, error } = await supabase.auth.signInWithPassword({
+    if (!email || !password) {
+      Alert.alert('Error', 'Por favor, ingresa correo y contraseña.');
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
       Alert.alert('Error', 'Correo o contraseña incorrectos.');
-      console.error(error.message);
+      console.error('Login error:', error.message);
       return;
     }
 
-    console.log('Usuario autenticado:', user);
+    Alert.alert('Éxito', 'Inicio de sesión exitoso');
+    console.log('Usuario autenticado:', data.user);
     navigation.navigate('MainScreen');
-  };
-
-  const SignUp = async () => {
-    const { user, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      Alert.alert('Error', 'No se pudo registrar el usuario.');
-      console.error(error.message);
-      return;
-    }
-
-    Alert.alert('Éxito', 'Usuario registrado correctamente.');
-    console.log('Usuario registrado:', user);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.welcomeText}>Bienvenido de Vuelta!!</Text>
-        <Text style={styles.subText}> Porfavor, registrate con tu cuenta existente</Text>
+        <Text style={styles.subText}>Por favor, ingresa con tu cuenta</Text>
       </View>
 
-      {/* Login Form */}
       <View style={styles.formContainer}>
-        {/* Email Field */}
         <Text style={styles.labelText}>EMAIL</Text>
         <TextInput
           style={styles.input}
@@ -66,7 +52,6 @@ export default function LogIn({ navigation }) {
           placeholderTextColor="#aaa"
         />
 
-        {/* Password Field */}
         <Text style={styles.labelText}>PASSWORD</Text>
         <View style={styles.passwordContainer}>
           <TextInput
@@ -75,26 +60,20 @@ export default function LogIn({ navigation }) {
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
             placeholder="Password"
-            placeholderTextColor="#aaa"/>
-
+            placeholderTextColor="#aaa"
+          />
           <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword(!showPassword)}>
             <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#666" />
           </TouchableOpacity>
         </View>
 
-        {/* Login Button */}
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Log in</Text>
         </TouchableOpacity>
 
-        {/* <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.signupText}> SIGN UP</Text>
-        </TouchableOpacity> */}
-
-        {/* Sign Up */}
         <View style={styles.signupContainer}>
           <Text style={styles.noAccountText}>No tienes una cuenta?</Text>
-          <TouchableOpacity onPress={()=> navigation.navigate('SignUp')}>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
             <Text style={styles.signupText}> Sign Up</Text>
           </TouchableOpacity>
         </View>

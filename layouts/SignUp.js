@@ -14,29 +14,29 @@ export default function SignUp({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const SignUp = async () => {
+  const handleSignUp = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Por favor, ingresa un correo y una contraseña.');
       return;
     }
 
-    const { user, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
     if (error) {
-      if (error.message.includes('already registered')) {
-        Alert.alert('Error', 'El correo ya está registrado. Por favor, usa otro.');
+      if (error.message.includes('already')) {
+        Alert.alert('Error', 'El correo ya está registrado.');
       } else {
         Alert.alert('Error', 'No se pudo registrar el usuario.');
       }
-      console.error(error.message);
+      console.error('Signup error:', error.message);
       return;
     }
 
     Alert.alert('Éxito', 'Usuario registrado correctamente.');
-    console.log('Usuario registrado:', user);
+    console.log('Usuario registrado:', data.user);
     navigation.goBack();
   };
 
@@ -64,7 +64,7 @@ export default function SignUp({ navigation }) {
           placeholderTextColor="#aaa"
           secureTextEntry
         />
-        <TouchableOpacity style={styles.signUpButton} onPress={() => SignUp()}>
+        <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
           <Text style={styles.signUpButtonText}>SIGN UP</Text>
         </TouchableOpacity>
       </View>
