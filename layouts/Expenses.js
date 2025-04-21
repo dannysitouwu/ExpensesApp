@@ -15,7 +15,7 @@ export default function Expenses({ navigation }) {
   const fetchExpenses = async () => {
     const { data, error } = await supabase
       .from('Expenses')
-      .select('amount, id, tittle')
+      .select('amount, id, tittle, validated_user_id')
       .order('created_at', { ascending: false }); 
 
     if (error) {
@@ -97,7 +97,7 @@ export default function Expenses({ navigation }) {
       <View style={styles.footer}>
         <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Expenses')}>
           <Ionicons name="cash-outline" size={24} color="black" />
-          <Text style={styles.footerText}>Expenses</Text>
+          <Text style={styles.footerText}>Gastos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('MainScreen')}>
           <Ionicons name="home-outline" size={24} color="black" />
@@ -105,7 +105,7 @@ export default function Expenses({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Spent')}>
           <Ionicons name="calculator-outline" size={24} color="black" />
-          <Text style={styles.footerText}>Spent</Text>
+          <Text style={styles.footerText}>Agregar</Text>
         </TouchableOpacity>
       </View>    
             
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     position: 'absolute',
-    bottom: 40,
+    bottom: 20,
     left: 10,
     right: 10,
   },

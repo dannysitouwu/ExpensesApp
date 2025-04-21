@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
-import { RefreshControl, ScrollView } from 'react-native-gesture-handler';
-
-// Supabase client
+import { RefreshControl } from 'react-native-gesture-handler';
 import { createClient } from '@supabase/supabase-js';
+
 const supabaseUrl = 'https://lueckcjjjsjwiesapqhs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZWNrY2pqanNqd2llc2FwcWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NTIzNzIsImV4cCI6MjA1OTAyODM3Mn0.y6i8VwWytF-eGuNvWvbTDXX3R5A3W5AxYygZnjXycJg';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -53,6 +52,17 @@ const MainScreen = ({ navigation }) => {
     setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== id));
 
     fetchExpenses();
+  };
+
+  const handleLogOut = async () => {
+    const { data,error } = await supabase.auth.signOut();
+    if (error) {
+      Alert.alert('Error', 'No se pudo cerrar la sesión. Intenta nuevamente.');
+      console.error('Error al cerrar sesión:', error.message);
+      return;
+    }
+    Alert.alert('Concluido', 'LogOut del usuario');
+    navigation.navigate('LogIn'); 
   };
 
   const onRefresh = async () => {
@@ -137,7 +147,7 @@ const MainScreen = ({ navigation }) => {
         <View style={styles.footer}>
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Expenses')}>
             <Ionicons name="cash-outline" size={24} color="black" />
-            <Text style={styles.footerText}>Expenses</Text>
+            <Text style={styles.footerText}>Gastos</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('MainScreen')}>
             <Ionicons name="home-outline" size={24} color="black" />
@@ -145,9 +155,15 @@ const MainScreen = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('SpentTittle')}>
             <Ionicons name="calculator-outline" size={24} color="black" />
-            <Text style={styles.footerText}>Spent</Text>
+            <Text style={styles.footerText}>Agregar</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Log Out Button */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut}>
+          <Ionicons name="log-out-outline" size={24} color="white" />
+          <Text style={styles.logoutText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -275,7 +291,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     position: 'absolute',
-    bottom: 40,
+    bottom: 15,
     left: 10,
     right: 10,
   },
@@ -286,6 +302,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'black',
     marginTop: 5,
+  },
+  logoutButton: {
+    position: 'absolute',
+    right: 4,
+    backgroundColor: '#6F3B9F',
+    borderRadius: 30,
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+  },
+  logoutText: {
+    color: 'white',
+    fontSize: 14,
+    marginLeft: 5,
   },
 });
 

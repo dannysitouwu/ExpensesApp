@@ -39,23 +39,24 @@ export default function SignUp({ navigation }) {
     console.log('Usuario registrado:', data.user);
     navigation.goBack();
   };
-
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.welcomeText}>¡No tienes una cuenta?</Text>
+        <Text style={styles.subText}>¡Crea la tuya ahora!</Text>
+      </View>
+
       <View style={styles.formContainer}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Crea una Cuenta!!</Text>
-        </View>
+        <Text style={styles.labelText}>EMAIL</Text>
         <TextInput
           style={styles.input}
           value={email}
           onChangeText={setEmail}
-          placeholder="Email"
+          placeholder="example@gmail.com"
           placeholderTextColor="#aaa"
         />
+
+        <Text style={styles.labelText}>PASSWORD</Text>
         <TextInput
           style={styles.input}
           value={password}
@@ -64,8 +65,11 @@ export default function SignUp({ navigation }) {
           placeholderTextColor="#aaa"
           secureTextEntry
         />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
-          <Text style={styles.signUpButtonText}>SIGN UP</Text>
+          <Text style={styles.signUpButtonText}>Sign In</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -74,31 +78,42 @@ export default function SignUp({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#6F3B8E',
+  },
+  headerContainer: {
+    height: '35%',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#D0D4FE',
+    paddingHorizontal: 20,
+  },
+  welcomeText: {
+    color: 'white',
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  subText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
   },
   formContainer: {
-    // flex: 1,
-    width: '95%',
+    flex: 1,
     backgroundColor: '#A197D9',
     borderRadius: 35,
-    padding: 20,
+    padding: 30,
     borderWidth: 3,
     strokeColor: 'black',
     marginHorizontal: 8,
-    marginBottom: 20,
+    marginBottom: -40,
   },
-  title: {
-    fontSize: 24,
+  labelText: {
+    color: '#444',
+    fontSize: 12,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#6F3B8E',
-    textAlign: 'center',
+    marginBottom: 5,
   },
   input: {
-    width: '100%',
     backgroundColor: '#F3F3F3',
     borderRadius: 8,
     padding: 12,
@@ -112,11 +127,20 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
+    marginTop: 10,
   },
   signUpButtonText: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  backButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 25,
+    backgroundColor: '#A197D9',
+    borderWidth: 2,
+    borderRadius: 20,
+    padding: 10,
   },
 });

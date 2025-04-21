@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-// SupaBaseClient
-import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://lueckcjjjsjwiesapqhs.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZWNrY2pqanNqd2llc2FwcWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NTIzNzIsImV4cCI6MjA1OTAyODM3Mn0.y6i8VwWytF-eGuNvWvbTDXX3R5A3W5AxYygZnjXycJg'
-const supabase = createClient(supabaseUrl, supabaseKey)
+import { useAuth } from './contexts/AuthContext';
 
 export default function LogIn({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, loading } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -19,20 +16,22 @@ export default function LogIn({ navigation }) {
       return;
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      Alert.alert('Error', 'Correo o contraseña incorrectos.');
-      console.error('Login error:', error.message);
-      return;
+    setIsLoading(true);
+    try {
+      const result = await signIn(email, password);
+      
+      if (result.success) {
+        Alert.alert('Éxito', 'Inicio de sesión exitoso');
+        navigation.navigate('MainScreen');
+      } else {
+        Alert.alert('Error', result.message || 'Correo o contraseña incorrectos.');
+      }
+    } catch (error) {
+      console.error('Error inesperado:', error.message);
+      Alert.alert('Error', 'Ocurrió un error inesperado. Por favor, intenta de nuevo.');
+    } finally {
+      setIsLoading(false);
     }
-
-    Alert.alert('Éxito', 'Inicio de sesión exitoso');
-    console.log('Usuario autenticado:', data.user);
-    navigation.navigate('MainScreen');
   };
 
   return (
@@ -50,6 +49,9 @@ export default function LogIn({ navigation }) {
           onChangeText={setEmail}
           placeholder="example@gmail.com"
           placeholderTextColor="#aaa"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          editable={!isLoading}
         />
 
         <Text style={styles.labelText}>PASSWORD</Text>
@@ -61,19 +63,28 @@ export default function LogIn({ navigation }) {
             secureTextEntry={!showPassword}
             placeholder="Password"
             placeholderTextColor="#aaa"
+            editable={!isLoading}
           />
           <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword(!showPassword)}>
             <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#666" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Log in</Text>
+        <TouchableOpacity 
+          style={[styles.loginButton, isLoading && styles.disabledButton]} 
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.loginButtonText}>Log in</Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.signupContainer}>
           <Text style={styles.noAccountText}>No tienes una cuenta?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')} disabled={isLoading}>
             <Text style={styles.signupText}> Sign Up</Text>
           </TouchableOpacity>
         </View>
@@ -106,11 +117,9 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    // height: '65%',
     backgroundColor: '#A197D9',
     borderRadius: 35,
     padding: 30,
-    // strokeWidth: 3,
     borderWidth: 3,
     strokeColor: 'black',
     marginHorizontal: 8,
@@ -147,38 +156,6 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 10,
   },
-  rememberRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#666',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-  },
-  checkboxChecked: {
-    backgroundColor: '#6F3B8E',
-  },
-  rememberText: {
-    marginLeft: 8,
-    color: '#333',
-    fontSize: 14,
-  },
-  forgotText: {
-    color: '#4B3A70',
-    fontSize: 14,
-  },
   loginButton: {
     backgroundColor: '#6F3B8E',
     borderRadius: 10,
@@ -186,6 +163,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
+  },
+  disabledButton: {
+    backgroundColor: '#9E7BB2',
   },
   loginButtonText: {
     color: 'white',

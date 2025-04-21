@@ -1,6 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
+import { AuthProvider } from './layouts/contexts/AuthContext';
+
 import SplashScreen from './layouts/SplashScreen';
 import LogIn from './layouts/LogIn';
 import SignUp from './layouts/SignUp';
@@ -9,11 +11,13 @@ import Spent from './layouts/Spent';
 import SpentTittle from './layouts/SpentTittle';
 import Expenses from './layouts/Expenses';
 import Statistics from './layouts/Statistics';
+// import { UserProvider } from './contexts/UserContext';
 
 
 const Stack = createStackNavigator();
 export default function App() {
   return (
+    <AuthProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SplashScreen">
         <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
@@ -27,5 +31,6 @@ export default function App() {
         
       </Stack.Navigator>
     </NavigationContainer>
+    </AuthProvider>
   );
 }
